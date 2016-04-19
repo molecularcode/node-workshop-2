@@ -14,7 +14,7 @@ function getFortune(randNum) {
     return quotes[randNum];
 }
 
-console.log(getFortune(Math.floor(Math.random() * 10)));
+getFortune(Math.floor(Math.random() * 10));
 
 
 module.exports = {

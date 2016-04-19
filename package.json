@@ -1,0 +1,19 @@
+{
+  "name": "fortune",
+  "version": "1.0.0",
+  "description": "Fortune teller - node JS workshop part 2",
+  "main": "call-callbacks.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/molecularcode/node-workshop-2.git"
+  },
+  "author": "Alex Ruaux",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/molecularcode/node-workshop-2/issues"
+  },
+  "homepage": "https://github.com/molecularcode/node-workshop-2#readme"
+}

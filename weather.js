@@ -14,11 +14,10 @@
 //      node-emoji
 
 
-// > npm install prompt, request, colors, cli-table, node-emoji
+// > npm install prompt, request, colors, node-emoji
 var prompt = require('prompt');
 var request = require('request');
 var colors = require('colors');
-var table = require('cli-table');
 var emoji = require('node-emoji');
 prompt.start();
 
@@ -48,16 +47,14 @@ prompt.get(['locationCity'], function (err, result) {
             
             /* Weather functions
             ------------------------------------------------------------- */
-            // Convert the first letter of a sting to lowercase for those used inline with sentences
+            // Convert the first letter of a sting to lowercase for those used inline with sentences and remove the fullstop
             function convertLower(str) {
-                return str.charAt(0).toLowerCase() + str.substring(1);
+                return str.charAt(0).toLowerCase() + str.substring(1, str.length - 1);
             }
-            
             // Convert temperatures from F to C
             function tempC(str) {
                 return ((str - 32) * 5/9).toFixed(0);
             }
-            
             // Get day number and pull the day name from an array
             function dayName(num) {
                 var date = new Date(num*1000);
@@ -69,64 +66,54 @@ prompt.get(['locationCity'], function (err, result) {
 
             // Get current weather for user's location for today and the following 5 days and stuff in to an object
             var forecast = {};
+            console.log("\nThe weather in ".red + myCity.red + " for the next 6 days will be:\n".red);
             for(var i = 0; i <= 5; i++) {
               
-            // Check for the icon and set the corresponding emoji in the object 
-            var wIcon = result2Object.daily.data[i].icon;
-
-            switch (wIcon) {
-                case "clear-day":
-                    wIcon = emoji.get('sunny');
-                break;
-                case "clear-night":
-                    wIcon = emoji.get('night_with_stars');
-                break;
-                case "rain":
-                    wIcon = emoji.get('umbrella');
-                break;
-                case "snow":
-                    wIcon = emoji.get('snowflake');
-                break;
-                case "sleet":
-                    wIcon = emoji.get('droplet');
-                break;
-                case "wind":
-                    wIcon = emoji.get('warning');
-                break;
-                case "fog":
-                    wIcon = emoji.get('foggy');
-                break;
-                case "cloudy":
-                    wIcon = emoji.get('cloud');
-                break;
-                case "partly-cloudy-day":
-                    wIcon = emoji.get('partly_sunny');
-                break;
-                case "partly-cloudy-night":
-                    wIcon = emoji.get('crescent_moon');
-                break;
-                default:
-                    wIcon = emoji.get('sunny');
-                break;
-            }
+                // Check for the icon and set the corresponding emoji in the object 
+                var wIcon = result2Object.daily.data[i].icon;
+    
+                switch (wIcon) {
+                    case "clear-day":
+                        wIcon = emoji.get('sunny').yellow;
+                    break;
+                    case "clear-night":
+                        wIcon = emoji.get('night_with_stars');
+                    break;
+                    case "rain":
+                        wIcon = emoji.get('umbrella').blue;
+                    break;
+                    case "snow":
+                        wIcon = emoji.get('snowflake').white;
+                    break;
+                    case "sleet":
+                        wIcon = emoji.get('droplet').blue;
+                    break;
+                    case "wind":
+                        wIcon = emoji.get('warning').magenta;
+                    break;
+                    case "fog":
+                        wIcon = emoji.get('foggy').grey;
+                    break;
+                    case "cloudy":
+                        wIcon = emoji.get('cloud').grey;
+                    break;
+                    case "partly-cloudy-day":
+                        wIcon = emoji.get('partly_sunny');
+                    break;
+                    case "partly-cloudy-night":
+                        wIcon = emoji.get('crescent_moon');
+                    break;
+                    default:
+                        wIcon = emoji.get('sunny').yellow;
+                    break;
+                }
                 
-            forecast[dayName(result2Object.daily.data[i].time)] = {summary:convertLower(result2Object.daily.data[i].summary), min: tempC(result2Object.daily.data[i].temperatureMin), max: tempC(result2Object.daily.data[i].temperatureMax), icon: wIcon};
+               forecast[dayName(result2Object.daily.data[i].time)] = {summary:convertLower(result2Object.daily.data[i].summary), tempMin: tempC(result2Object.daily.data[i].temperatureMin), tempMax: tempC(result2Object.daily.data[i].temperatureMax), icon: wIcon};
             }
-            
-            console.log(forecast);
-            
-            console.log("\nThe weather in " + myCity + " is currently: \n" +
-            // "Summary: " + emoji.get('coffee') + curSum + "\n" +
-            // "Temperature: " + curTemp + " C\n" +
-            // "Wind Speed: " + curWindSp + " mi/hr\n" +
-            // "Cloud Cover: " + curCloudCov + "\n"
-            // );
-            
-            // var foreSum = convertLower(result2Object.daily.summary);
-            // console.log("The weather for the next 5 days will be " + foreSum + "\n");
-            
-            // console.log(forecast["foreNext" + i + "Day"] + " will be " + forecast["foreNext" + i + "Sum"] + " with temparatures ranging from " + forecast["foreNext" + i + "TempMin"] + " C to " + forecast["foreNext" + i + "TempMax"] + " C.\n");
 
+            for(var prop in forecast){
+                console.log(forecast[prop].icon + " " + prop.bold  + " will be " + forecast[prop].summary + ", with temperatures ranging from " + forecast[prop].tempMin + " C to " + forecast[prop].tempMax + " C.\n");
+            }
         });
     });
 });

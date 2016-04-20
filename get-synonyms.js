@@ -12,7 +12,7 @@ prompt.get([{name:'word', description:"Enter a word to search for its synonyms"}
     search.getSynonyms(word, function(result) {
         for(var prop in result){
             if (result.hasOwnProperty(prop)) {
-                console.log("Synonyms of the ".red + prop.red + " " + word.red + " :\n" + result[prop].syn.join("\n"));
+                console.log("Synonyms of the ".red + prop.red + " " + word.red + ":\n" + result[prop].syn.join("\n"));
                 //console.log(result);
             }
         }

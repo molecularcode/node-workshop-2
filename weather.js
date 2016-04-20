@@ -14,12 +14,12 @@
 //      node-emoji
 
 
-// > npm install prompt
-// > npm install request
+// > npm install prompt, request, colors, cli-table, node-emoji
 var prompt = require('prompt');
 var request = require('request');
-
-
+var colors = require('colors');
+var table = require('cli-table');
+var emoji = require('node-emoji');
 prompt.start();
 
 
@@ -37,35 +37,96 @@ prompt.get(['locationCity'], function (err, result) {
         var resultObject = JSON.parse(result.body);
         var myCity = resultObject.results[0].formatted_address;
         var myLat = resultObject.results[0].geometry.location.lat;
-        //var myLat2 = resultObject.results[0].geometry.location.lat.toFixed(2);
         var myLon = resultObject.results[0].geometry.location.lng;
-        //var myLon2 = resultObject.results[0].geometry.location.lng.toFixed(2);
-        //console.log ("\nThe latitude of " + myCity + " is " + myLat2 + " and the longitude is " + myLon2 + ".\n");
         
         // Construct the url of the weather for the user's location
         var fullWeatherURL = weatherURL + myLat + "," + myLon;
-        //console.log(fullWeatherURL);
         
         // Retrieve the weather for the user's location
         request(fullWeatherURL, function(err, result2) {
             var result2Object = JSON.parse(result2.body);
-            //console.log(result2Object);
             
-            // Get current weather for user's location
-            var curSum = result2Object.currently.summary;
-            var curTemp = ((result2Object.currently.temperature - 32) * 5/9).toFixed(1);
-            var curWindSp = result2Object.currently.windSpeed;
-            var curCloudCov = result2Object.currently.cloudCover;
+            /* Weather functions
+            ------------------------------------------------------------- */
+            // Convert the first letter of a sting to lowercase for those used inline with sentences
+            function convertLower(str) {
+                return str.charAt(0).toLowerCase() + str.substring(1);
+            }
             
-            console.log("The weather in " + myCity + " is currently: \n" +
-            "Summary: " + curSum + "\n" +
-            "Temperature: " + curTemp + " C\n" +
-            "Wind Speed: " + curWindSp + " mi/hr\n" +
-            "Cloud Cover: " + curCloudCov
-            );
+            // Convert temperatures from F to C
+            function tempC(str) {
+                return ((str - 32) * 5/9).toFixed(0);
+            }
             
+            // Get day number and pull the day name from an array
+            function dayName(num) {
+                var date = new Date(num*1000);
+                var day = date.getDay();
+                var days = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+                return days[day];
+            }
+
+
+            // Get current weather for user's location for today and the following 5 days and stuff in to an object
+            var forecast = {};
+            for(var i = 0; i <= 5; i++) {
+              
+            // Check for the icon and set the corresponding emoji in the object 
+            var wIcon = result2Object.daily.data[i].icon;
+
+            switch (wIcon) {
+                case "clear-day":
+                    wIcon = emoji.get('sunny');
+                break;
+                case "clear-night":
+                    wIcon = emoji.get('night_with_stars');
+                break;
+                case "rain":
+                    wIcon = emoji.get('umbrella');
+                break;
+                case "snow":
+                    wIcon = emoji.get('snowflake');
+                break;
+                case "sleet":
+                    wIcon = emoji.get('droplet');
+                break;
+                case "wind":
+                    wIcon = emoji.get('warning');
+                break;
+                case "fog":
+                    wIcon = emoji.get('foggy');
+                break;
+                case "cloudy":
+                    wIcon = emoji.get('cloud');
+                break;
+                case "partly-cloudy-day":
+                    wIcon = emoji.get('partly_sunny');
+                break;
+                case "partly-cloudy-night":
+                    wIcon = emoji.get('crescent_moon');
+                break;
+                default:
+                    wIcon = emoji.get('sunny');
+                break;
+            }
+                
+            forecast[dayName(result2Object.daily.data[i].time)] = {summary:convertLower(result2Object.daily.data[i].summary), min: tempC(result2Object.daily.data[i].temperatureMin), max: tempC(result2Object.daily.data[i].temperatureMax), icon: wIcon};
+            }
             
-            // Get 5 day forecast for user's location
+            console.log(forecast);
+            
+            console.log("\nThe weather in " + myCity + " is currently: \n" +
+            // "Summary: " + emoji.get('coffee') + curSum + "\n" +
+            // "Temperature: " + curTemp + " C\n" +
+            // "Wind Speed: " + curWindSp + " mi/hr\n" +
+            // "Cloud Cover: " + curCloudCov + "\n"
+            // );
+            
+            // var foreSum = convertLower(result2Object.daily.summary);
+            // console.log("The weather for the next 5 days will be " + foreSum + "\n");
+            
+            // console.log(forecast["foreNext" + i + "Day"] + " will be " + forecast["foreNext" + i + "Sum"] + " with temparatures ranging from " + forecast["foreNext" + i + "TempMin"] + " C to " + forecast["foreNext" + i + "TempMax"] + " C.\n");
+
         });
     });
 });
